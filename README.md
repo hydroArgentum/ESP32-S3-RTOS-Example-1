@@ -23,3 +23,13 @@ ESP32-S3 Feather 4MB Flash/2MB PSRAM
 		- NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
 		- NEO_RGBW    Pixels are wired for RGBW bitstream (NeoPixel RGBW products)
 	- See the strandtest.ino example script from the Adafruit NeoPixel library for more information.
+- I guessed that the blinky code and NeoPixel code will take 1KB and 2KB, respectively, by just guessing.
+	- One way to properly figure out how much stack each task will require is to compile each task as a super loop in separate sketches and verifying the amount of stack they consume.
+	- However, remember that, for ESP-IDF RTOS, the minimum stack size considering overhead is 768 bytes and this increases if you enable stack options.
+		- CONFIG_STACK_CHECK_STRONG adds an additional 256 bytes to the overhead.
+		- CONFIG_COMPILER_OPTIMIZATION_NONE adds an additional 320 bytes to the overhead.
+		- CONFIG_APPTRACE_ENABLE adds an additional 1280 bytes to the overhead.
+		- CONFIG_FREERTOS_WATCHPOINT_END_OF_STACK adds an additional 60 bytes to the overhead.
+		- CONFIG_STACK_CHECK_ALL will add all of the above.
+		- So remember to add the minimum 768 bytes, the additional stack options (if used), and the size returned from the build (plus a little more if you want to stay on the safe side; round up to the nearest "nice" value) when assigning the stack size.
+		- TODO the above.
